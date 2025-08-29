@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects Admin</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{font-family:Inter,system-ui,sans-serif} .wrap{max-width:1100px}</style>
+</head>
+<body class="bg-gradient-to-b from-[#eef4ff] to-white text-[#0b152c]">
+  <header class="sticky top-0 z-40 border-b border-[#e7edf7] bg-white/80 backdrop-blur">
+    <div class="wrap mx-auto flex items-center justify-between px-5 py-4">
+      <a href="index.html" class="font-bold">← The (un)Stable Net</a>
+      <nav class="text-sm flex gap-4 opacity-90">
+        <a href="articles.html" class="hover:opacity-100">Articles</a>
+        <a href="projects.html" class="hover:opacity-100">Projects</a>
+        <a href="bio.html" class="hover:opacity-100">Bio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap mx-auto px-5 pt-8">
+    <h1 class="mb-1 text-3xl font-extrabold">Projects Admin</h1>
+    <p class="mb-6 max-w-2xl text-[#4c5c83]">Create and manage project cards that the Home page can read from <code>api/projects.json</code>. Export your list to replace the API file when ready.</p>
+
+    <section class="mb-6 grid grid-cols-1 gap-4 rounded-xl border border-[#e7edf7] bg-white p-4 shadow-sm md:grid-cols-2">
+      <label class="grid gap-1"><span class="text-sm font-semibold">Title</span><input id="pTitle" class="rounded-lg border border-[#dbe6ff] px-3 py-2" placeholder="Project name"/></label>
+      <label class="grid gap-1"><span class="text-sm font-semibold">Tag</span><input id="pTag" class="rounded-lg border border-[#dbe6ff] px-3 py-2" placeholder="Platform, Research, Tool"/></label>
+      <label class="grid gap-1 md:col-span-2"><span class="text-sm font-semibold">Blurb</span><textarea id="pBlurb" rows="3" class="rounded-lg border border-[#dbe6ff] px-3 py-2" placeholder="One or two lines"></textarea></label>
+      <label class="grid gap-1"><span class="text-sm font-semibold">Page link</span><input id="pHref" class="rounded-lg border border-[#dbe6ff] px-3 py-2" placeholder="msb.html"/></label>
+      <label class="grid gap-1"><span class="text-sm font-semibold">Cover</span><input id="pCover" type="file" accept="image/*" class="rounded-lg border border-[#dbe6ff] px-3 py-2"/></label>
+      <div class="md:col-span-2 flex flex-wrap items-center gap-2"><button id="addBtn" class="rounded-xl border border-[#dbe6ff] bg-white px-4 py-2 font-bold">＋ Add</button><span id="msg" class="text-sm text-[#4c5c83]"></span></div>
+    </section>
+
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <h2 class="text-lg font-extrabold">Projects</h2>
+      <div class="flex gap-2">
+        <button id="exportBtn" class="rounded-xl border border-[#dbe6ff] bg-white px-3 py-2 text-sm font-bold">⤓ Export JSON</button>
+        <button id="importBtn" class="rounded-xl border border-[#dbe6ff] bg-white px-3 py-2 text-sm">Import JSON</button>
+        <input id="importFile" type="file" accept="application/json" hidden />
+      </div>
+    </div>
+
+    <div id="grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+  </main>
+
+  <footer class="mt-10 border-t border-[#e7edf7] py-6 text-center text-sm text-[#6b7897]">© <span id="y"></span> The (un)Stable Net</footer>
+
+  <script>
+    const LS = 'tsn_projects';
+    const grid = document.getElementById('grid');
+    const addBtn = document.getElementById('addBtn');
+    const pTitle = document.getElementById('pTitle');
+    const pTag = document.getElementById('pTag');
+    const pBlurb = document.getElementById('pBlurb');
+    const pHref = document.getElementById('pHref');
+    const pCover = document.getElementById('pCover');
+    const msg = document.getElementById('msg');
+
+    function readAsDataURL(file){return new Promise((res,rej)=>{const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(file)})}
+    function slugify(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,32)||('p-'+Math.random().toString(36).slice(2,8))}
+    function load(){ try{return JSON.parse(localStorage.getItem(LS)||'[]')}catch{return[]} }
+    function save(list){ localStorage.setItem(LS, JSON.stringify(list)); }
+
+    function tmpl(p,i){
+      const cover = p.cover || `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='800' height='450' fill='#0b1226'/><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#1f4aff'/><stop offset='100%' stop-color='#00b7ff'/></linearGradient></defs><rect width='800' height='450' fill='url(#g)' opacity='0.18'/><text x='28' y='60' fill='#dbe5ff' font-family='Inter,Arial' font-weight='700' font-size='28'>${(p.title||'Project').replace(/</g,'&lt;')}</text><text x='28' y='96' fill='#a9b7d9' font-family='Inter,Arial' font-size='18'>${(p.tag||'')}</text></svg>`)}`;
+      return `<article class='overflow-hidden rounded-2xl border border-[#e7edf7] bg-white shadow-sm'>
+        <div class='aspect-[16/9] w-full bg-cover bg-center' style='background-image:url(${cover})'></div>
+        <div class='p-4'>
+          <span class='mb-1 inline-block rounded-full border border-[#d7e4ff] bg-[#e7efff] px-2 py-0.5 text-[11px] font-extrabold text-[#2140b8]'>${p.tag||'Project'}</span>
+          <h3 class='mt-1 text-lg font-extrabold'>${p.title}</h3>
+          <p class='text-sm text-[#2a3552]'>${p.blurb||''}</p>
+          <div class='mt-3 flex flex-wrap gap-2'>
+            <a class='rounded-lg border border-[#dbe6ff] px-3 py-1 text-sm font-bold' href='${p.href||'#'}' target='_blank'>Open page</a>
+            <button class='rounded-lg border border-[#dbe6ff] px-3 py-1 text-sm' data-act='edit' data-idx='${i}'>✏️ Edit</button>
+            <button class='rounded-lg border border-[#dbe6ff] px-3 py-1 text-sm' data-act='del' data-idx='${i}'>🗑 Delete</button>
+          </div>
+        </div>
+      </article>`
+    }
+
+    function render(){ grid.innerHTML = load().map(tmpl).join(''); }
+
+    addBtn.addEventListener('click', async ()=>{
+      const title = pTitle.value.trim(); if(!title) return msg.textContent='Title required';
+      const tag = pTag.value.trim(); const blurb = pBlurb.value.trim(); const href = pHref.value.trim()|| (title.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.html');
+      let cover=''; if(pCover.files[0]) cover = await readAsDataURL(pCover.files[0]);
+      const list = load(); list.push({id:slugify(title), title, tag, blurb, href, cover}); save(list); render(); msg.textContent='Added ✓'; setTimeout(()=>msg.textContent='',1500);
+      pTitle.value=''; pTag.value=''; pBlurb.value=''; pHref.value=''; pCover.value='';
+    });
+
+    grid.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-act]'); if(!btn) return; const act=btn.getAttribute('data-act'); const idx=+btn.getAttribute('data-idx'); const list=load(); const item=list[idx]; if(!item) return;
+      if(act==='del'){ if(confirm('Delete this project?')){ list.splice(idx,1); save(list); render(); } }
+      if(act==='edit'){
+        pTitle.value=item.title; pTag.value=item.tag; pBlurb.value=item.blurb; pHref.value=item.href; list.splice(idx,1); save(list); render();
+      }
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const api = { projects: load() };
+      const blob = new Blob([JSON.stringify(api,null,2)], {type:'application/json'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='projects.json'; a.click(); URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('importFile').click());
+    document.getElementById('importFile').addEventListener('change', async (e)=>{
+      const f=e.target.files?.[0]; if(!f) return; const txt=await f.text(); try{const json=JSON.parse(txt); if(json && Array.isArray(json.projects)){ localStorage.setItem(LS, JSON.stringify(json.projects)); render(); }}catch{}
+      e.target.value='';
+    });
+
+    document.getElementById('y').textContent = new Date().getFullYear();
+    render();
+  </script>
+</body>
+</html>

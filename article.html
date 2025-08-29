@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Article</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--line:#e7edf7; --ink:#0b152c; --maxw:900px}
+    body{margin:0; font-family:Inter,system-ui,sans-serif; color:var(--ink); background:linear-gradient(135deg,#eaf1ff,#f7fbff)}
+    header{position:sticky;top:0;background:rgba(255,255,255,.7);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    a{color:#2140b8; text-decoration:none}
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:18px 20px}
+    h1{font-size: clamp(28px, 4.4vw, 46px); margin:.2rem 0 .4rem}
+    .tag{display:inline-block;background:#e7efff;border:1px solid #d7e4ff;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;color:#2140b8}
+    .meta{color:#61709a}
+    article{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(12,23,52,.06);padding:18px}
+    article img{max-width:100%;border-radius:12px}
+    footer{color:#61709a;padding:20px 0;text-align:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap"><a href="index.html">← Home</a> • <a href="articles.html">Articles</a></div>
+    <div class="wrap"><span class="tag" id="tag">Tag</span><h1 id="title">Title</h1><div class="meta">By Jacopo • <span id="date"></span></div></div>
+  </header>
+
+  <main class="wrap">
+    <article id="article">Loading…</article>
+    <footer>© <span id="y"></span> The (un)Stable Net</footer>
+  </main>
+
+  <script>
+    function getParam(name){const u=new URL(location.href);return u.searchParams.get(name)}
+    function loadLS(){ try{ return JSON.parse(localStorage.getItem('tsn_articles')||'[]'); }catch{ return [] } }
+    async function fetchPost(slug){
+      try{ const r=await fetch(`api/posts/${slug}.html`,{cache:'no-store'}); if(!r.ok) throw 0; return await r.text(); }catch{ return null }
+    }
+
+    async function init(){
+      const slug = getParam('slug');
+      const y = document.getElementById('y'); y.textContent = new Date().getFullYear();
+      document.getElementById('date').textContent = new Date().toLocaleDateString();
+      if(!slug){ document.getElementById('title').textContent='Missing slug'; document.getElementById('article').innerHTML='<p>No article specified.</p>'; return; }
+      const list = loadLS();
+      const a = list.find(x=>x.slug===slug);
+      if(a){
+        document.getElementById('title').textContent = a.title;
+        document.getElementById('tag').textContent = a.tag || 'Note';
+        document.getElementById('article').innerHTML = a.html;
+        return;
+      }
+      const html = await fetchPost(slug);
+      if(html){
+        document.getElementById('title').textContent = slug.replace(/-/g,' ');
+        document.getElementById('tag').textContent = 'Research';
+        document.getElementById('article').innerHTML = html;
+      } else {
+        document.getElementById('title').textContent = 'Not found';
+        document.getElementById('article').innerHTML = '<p>Article not found in local library or API.</p>';
+      }
+    }
+    init();
+  </script>
+</body>
+</html>

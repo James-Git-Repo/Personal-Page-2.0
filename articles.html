@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Insights & Research — Articles Hub</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:Inter,system-ui,sans-serif}
+    .wrap{max-width:1100px}
+  </style>
+</head>
+<body class="bg-gradient-to-b from-[#eef4ff] to-white text-[#0b152c]">
+  <header class="sticky top-0 z-40 border-b border-[#e7edf7] bg-white/80 backdrop-blur">
+    <div class="wrap mx-auto flex items-center justify-between px-5 py-4">
+      <a href="index.html" class="font-bold">← The (un)Stable Net</a>
+      <nav class="text-sm flex gap-4 opacity-90">
+        <a href="articles.html" class="hover:opacity-100">Articles</a>
+        <a href="projects.html" class="hover:opacity-100">Projects</a>
+        <a href="bio.html" class="hover:opacity-100">Bio</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="wrap mx-auto px-5 pt-8">
+    <div class="mb-6">
+      <span class="inline-block rounded-full border border-[#d7e4ff] bg-[#e7efff] px-3 py-1 text-xs font-extrabold text-[#2140b8]">Research</span>
+      <h1 class="mt-2 text-3xl font-extrabold sm:text-4xl">Insights & Research</h1>
+      <p class="max-w-2xl text-[#4c5c83]">Upload new articles/papers and manage your research library. Click an item to open its reader page.</p>
+    </div>
+
+    <details class="mb-6 rounded-xl border border-[#e7edf7] bg-white p-4 shadow-sm open:shadow-md">
+      <summary class="cursor-pointer list-none text-sm font-bold">＋ Upload new article</summary>
+      <form id="upForm" class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2" onsubmit="return false;">
+        <label class="grid gap-1">
+          <span class="text-sm font-semibold">Title</span>
+          <input id="aTitle" class="rounded-lg border border-[#dbe6ff] px-3 py-2" placeholder="Article title"/>
+        </label>
+        <label class="grid gap-1">
+          <span class="text-sm font-semibold">Tag</span>
+          <select id="aTag" class="rounded-lg border border-[#dbe6ff] px-3 py-2">
+            <option>Research</option>
+            <option>Newsletter</option>
+            <option>Note</option>
+            <option>Update</option>
+          </select>
+        </label>
+        <label class="grid gap-1">
+          <span class="text-sm font-semibold">Cover (optional)</span>
+          <input id="aCover" type="file" accept="image/*" class="rounded-lg border border-[#dbe6ff] px-3 py-2"/>
+        </label>
+        <label class="grid gap-1">
+          <span class="text-sm font-semibold">File (.html or .md)</span>
+          <input id="aFile" type="file" accept="text/html,text/markdown,.html,.md" class="rounded-lg border border-[#dbe6ff] px-3 py-2"/>
+        </label>
+        <label class="md:col-span-2 grid gap-1">
+          <span class="text-sm font-semibold">Or paste content (HTML/Markdown)</span>
+          <textarea id="aBody" rows="8" class="rounded-lg border border-[#dbe6ff] px-3 py-2" placeholder="&lt;p&gt;Write or paste here…&lt;/p&gt;"></textarea>
+        </label>
+        <div class="md:col-span-2 flex flex-wrap items-center gap-2">
+          <button id="aSave" class="rounded-xl border border-[#dbe6ff] bg-white px-4 py-2 font-bold">Save</button>
+          <button id="aClear" class="rounded-xl border border-[#dbe6ff] bg-white px-4 py-2">Clear form</button>
+          <span id="aMsg" class="text-sm text-[#4c5c83]"></span>
+        </div>
+      </form>
+    </details>
+
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <h2 class="text-lg font-extrabold">Library</h2>
+      <div class="flex gap-2">
+        <button id="exportBtn" class="rounded-xl border border-[#dbe6ff] bg-white px-3 py-2 text-sm font-bold">⤓ Export JSON</button>
+        <button id="importBtn" class="rounded-xl border border-[#dbe6ff] bg-white px-3 py-2 text-sm">Import JSON</button>
+        <input id="importFile" type="file" accept="application/json" hidden />
+      </div>
+    </div>
+
+    <div id="grid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+  </section>
+
+  <footer class="mt-10 border-t border-[#e7edf7] py-6 text-center text-sm text-[#6b7897]">© <span id="y"></span> The (un)Stable Net</footer>
+
+  <script>
+    const LS = 'tsn_articles';
+    const listEl = document.getElementById('grid');
+    const up = {
+      title: document.getElementById('aTitle'),
+      tag: document.getElementById('aTag'),
+      cover: document.getElementById('aCover'),
+      file: document.getElementById('aFile'),
+      body: document.getElementById('aBody'),
+      save: document.getElementById('aSave'),
+      clear: document.getElementById('aClear'),
+      msg: document.getElementById('aMsg')
+    };
+
+    function slugify(s){return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,64) || 'post-'+Math.random().toString(36).slice(2,8)}
+    function readAsText(f){return new Promise((res,rej)=>{const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsText(f)})}
+    function readAsDataURL(f){return new Promise((res,rej)=>{const fr=new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(f)})}
+    function miniMd(md){ 
+      let h = md.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      h = h.replace(/^###\s?(.*)$/gm,'<h3>$1</h3>')
+           .replace(/^##\s?(.*)$/gm,'<h2>$1</h2>')
+           .replace(/^#\s?(.*)$/gm,'<h1>$1</h1>')
+           .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+           .replace(/\*(.*?)\*/g,'<em>$1</em>')
+           .replace(/^-\s+(.*)$/gm,'<li>$1</li>');
+      h = h.replace(/(<li>.*<\/li>\n?)+/g, m=>`<ul>${m}</ul>`);
+      h = h.split(/\n{2,}/).map(p=>/^<h\d|<ul|<li/.test(p)?p:`<p>${p}</p>`).join('\n');
+      return h;
+    }
+
+    function load(){ try{ return JSON.parse(localStorage.getItem(LS)||'[]'); }catch{ return [] } }
+    function save(list){ localStorage.setItem(LS, JSON.stringify(list)); }
+
+    function tmpl(a, i){
+      const cover = a.cover || `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='800' height='450' fill='#0b1226'/><rect width='800' height='450' fill='url(#g)' opacity='0.18'/><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#1f4aff'/><stop offset='100%' stop-color='#00b7ff'/></linearGradient></defs><text x='28' y='60' fill='#dbe5ff' font-family='Inter,Arial' font-weight='700' font-size='28'>${(a.title||'Untitled').replace(/</g,'&lt;')}</text><text x='28' y='96' fill='#a9b7d9' font-family='Inter,Arial' font-size='18'>${(a.tag||'')}</text></svg>`)}`;
+      return `<article class="overflow-hidden rounded-2xl border border-[#e7edf7] bg-white shadow-sm">
+        <div class="aspect-[16/9] w-full bg-[#1b2550] bg-cover bg-center" style="background-image:url('${cover}')"></div>
+        <div class="p-4">
+          <span class="mb-1 inline-block rounded-full border border-[#d7e4ff] bg-[#e7efff] px-2 py-0.5 text-[11px] font-extrabold text-[#2140b8]">${a.tag||'Note'}</span>
+          <h3 class="mt-1 text-lg font-extrabold">${a.title||'Untitled'}</h3>
+          <div class="mt-1 text-xs text-[#6b7897]">${new Date(a.date||Date.now()).toLocaleDateString()}</div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <a class="rounded-lg border border-[#dbe6ff] px-3 py-1 text-sm font-bold" href="article.html?slug=${a.slug}">Open</a>
+            <button class="rounded-lg border border-[#dbe6ff] px-3 py-1 text-sm" data-act="edit" data-idx="${i}">✏️ Edit</button>
+            <button class="rounded-lg border border-[#dbe6ff] px-3 py-1 text-sm" data-act="del" data-idx="${i}">🗑 Delete</button>
+            <button class="rounded-lg border border-[#dbe6ff] px-3 py-1 text-sm" data-act="dl" data-idx="${i}">⤓ Download .html</button>
+          </div>
+        </div>
+      </article>`
+    }
+
+    function render(){
+      const list = load();
+      listEl.innerHTML = list.map(tmpl).join('');
+    }
+
+    async function handleSave(){
+      const list = load();
+      const title = up.title.value.trim(); if(!title) return up.msg.textContent='Title required';
+      let body = up.body.value.trim();
+      if(up.file.files[0]){
+        const txt = await readAsText(up.file.files[0]);
+        if(/\.md$/i.test(up.file.files[0].name)) body = miniMd(txt); else body = txt;
+      }
+      const cover = up.cover.files[0] ? await readAsDataURL(up.cover.files[0]) : '';
+      const slug = slugify(title);
+      const art = { slug, title, tag: up.tag.value, date: Date.now(), cover, html: body||'<p>(Empty)</p>' };
+      list.unshift(art); save(list); render(); up.msg.textContent='Saved ✓'; setTimeout(()=> up.msg.textContent='', 1500);
+      up.title.value=''; up.body.value=''; up.file.value=''; up.cover.value='';
+    }
+
+    listEl.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-act]'); if(!btn) return;
+      const act = btn.getAttribute('data-act'); const idx = +btn.getAttribute('data-idx');
+      const list = load(); const a = list[idx]; if(!a) return;
+      if(act==='del'){ if(confirm('Delete this article?')){ list.splice(idx,1); save(list); render(); } }
+      if(act==='edit'){
+        document.querySelector('details').open = true;
+        up.title.value = a.title; up.tag.value = a.tag; up.body.value = a.html;
+        list.splice(idx,1); save(list); render();
+      }
+      if(act==='dl'){
+        const blob = new Blob([`<!doctype html><meta charset='utf-8'><title>${a.title}</title><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap' rel='stylesheet'><style>body{font-family:Inter,system-ui,sans-serif;margin:20px auto;max-width:800px;line-height:1.6} h1,h2,h3{line-height:1.2}</style><main><h1>${a.title}</h1><article>${a.html}</article></main>`], {type:'text/html'});
+        const aTag = document.createElement('a'); aTag.href = URL.createObjectURL(blob); aTag.download = `${a.slug}.html`; aTag.click(); URL.revokeObjectURL(aTag.href);
+      }
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const blob = new Blob([localStorage.getItem(LS)||'[]'], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'articles.json'; a.click(); URL.revokeObjectURL(a.href);
+    });
+    document.getElementById('importBtn').addEventListener('click', ()=> document.getElementById('importFile').click());
+    document.getElementById('importFile').addEventListener('change', async (e)=>{
+      const f = e.target.files?.[0]; if(!f) return; const txt = await f.text(); try{ const data = JSON.parse(txt); if(Array.isArray(data)){ localStorage.setItem(LS, JSON.stringify(data)); render(); } }catch{}
+      e.target.value='';
+    });
+
+    up.save.addEventListener('click', handleSave);
+    up.clear.addEventListener('click', ()=>{ up.title.value=''; up.body.value=''; up.file.value=''; up.cover.value=''; up.msg.textContent=''; });
+
+    document.getElementById('y').textContent = new Date().getFullYear();
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The (un)Stable Net — Home</title>
+  <meta name="description" content="The (un)Stable Net — projects, research, and a personal bio."/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --page:#ffffff; --ink:#0b152c; --line:#e7edf7; --card:#ffffff;
+      --primary:#1f4aff; --accent:#00b7ff; --chip:#eef4ff; --maxw:1120px;
+      --shadow:0 10px 30px rgba(12,23,52,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--page)}
+    header{position:sticky; top:0; z-index:40; backdrop-filter:saturate(140%) blur(8px); background:rgba(255,255,255,.9); border-bottom:1px solid var(--line)}
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:0 20px}
+    .nav{height:72px; display:flex; align-items:center; justify-content:space-between}
+    .brand{display:flex; align-items:center; gap:12px}
+    .mark{width:36px; height:36px; border-radius:12px; display:grid; place-items:center; color:#fff; background:conic-gradient(from 210deg, var(--primary), var(--accent)); box-shadow:var(--shadow)}
+    nav ul{display:flex; list-style:none; gap:16px; margin:0; padding:0}
+    nav a{color:#2140b8; font-weight:700; padding:8px 10px; border-radius:10px; text-decoration:none}
+    nav a:hover{background:#f4f7ff}
+
+    .hero{position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
+    canvas#net{position:absolute; inset:0; width:100%; height:100%; display:block; background:linear-gradient(180deg,#f7faff 0%,#ffffff 70%)}
+    .hero .inner{position:relative; max-width:var(--maxw); margin:0 auto; padding:56px 20px 32px; color:#263659}
+    .title{font-size: clamp(34px, 5vw, 60px); line-height:1.05; margin:8px 0 8px}
+    .subtitle{margin:0; color:#4c5c83; font-weight:600}
+    .chips{margin:16px 0 0; display:flex; gap:8px; flex-wrap:wrap}
+    .chip{background:var(--chip); border:1px solid #dbe6ff; color:#2140b8; padding:6px 12px; border-radius:999px; font-weight:800; font-size:12px}
+    .cta{display:flex; gap:12px; flex-wrap:wrap; margin:18px 0 0}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px; font-weight:800; border:1px solid #dbe6ff; color:#143166; background:#fff; cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg, var(--primary), var(--accent)); color:#ffffff; border-color:transparent}
+    .btn.small{padding:8px 12px; font-weight:700}
+
+    .newsletter{margin:22px 0 10px}
+    .nl-card{background:#f3f7ff; border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); padding:16px 16px; display:grid; grid-template-columns: 1.2fr .8fr; gap:12px}
+    .nl-input{padding:12px 12px; border-radius:10px; border:1px solid #cfe0ff; min-width:260px; font:inherit}
+
+    section.projects{padding:26px 0}
+    .section-head{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:16px}
+    .card{position:relative; background:var(--card); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); overflow:hidden; transition:transform .2s ease}
+    .card:hover{transform:translateY(-2px)}
+    .cover{width:100%; aspect-ratio:16/9; background:#1b2550; background-size:cover; background-position:center; border-bottom:1px solid var(--line); cursor:pointer}
+    .inner{padding:16px}
+    .tag{display:inline-flex; padding:6px 10px; border-radius:999px; background:#eef4ff; border:1px solid #dbe6ff; color:#2140b8; font-weight:800; font-size:12px}
+    .ghost{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; border:1px solid #dbe6ff; background:#fff; color:#18306b; font-weight:700}
+
+    .about{padding:24px 0 48px; display:grid; grid-template-columns: .38fr .62fr; gap:22px; align-items:center}
+    .portrait{width:100%; aspect-ratio:1/1; border-radius:20px; border:6px solid #ffffff; box-shadow:var(--shadow); background: url('https://dummyimage.com/700x700/1b274d/ced9ff&text=Your+Photo') center/cover no-repeat}
+    footer{border-top:1px solid var(--line); padding:18px 0; color:#6b7897}
+
+    @media (max-width: 780px){ .grid{grid-template-columns:1fr} .nl-card{grid-template-columns:1fr} .about{grid-template-columns:1fr; text-align:center} }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <div class="brand"><div class="mark" aria-hidden="true">TSN</div><h1>The (un)Stable Net</h1></div>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="articles.html">Articles</a></li>
+          <li><a href="projects.html">Projects Admin</a></li>
+          <li><a href="bio.html">Bio</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <canvas id="net" aria-hidden="true"></canvas>
+    <div class="inner">
+      <h2 class="title">The (un)Stable Net</h2>
+      <p class="subtitle">A blog about Business, Tech, AI & Content</p>
+      <div class="chips"><span class="chip">Business</span><span class="chip">Tech</span><span class="chip">AI</span><span class="chip">Content</span></div>
+      <div class="cta"><a class="btn primary" href="#projects">Explore projects</a><a class="btn" href="bio.html">About me</a></div>
+      <div class="newsletter" id="subscribe">
+        <div class="nl-card">
+          <div><strong>European Market Movers</strong><br/>A weekly, PM‑style wrap of European markets: what moved, why it mattered, and what’s next.</div>
+          <form class="nl-form" onsubmit="event.preventDefault(); alert('Thanks! I\'ll keep you posted.');">
+            <input id="email" type="email" required class="nl-input" placeholder="you@example.com" />
+            <button class="btn primary" type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section id="projects" class="projects" aria-labelledby="projects-title">
+      <div class="section-head">
+        <h2 id="projects-title" class="section-title">Projects</h2>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+          <button id="addProjectBtn" class="btn small" onclick="location.href='projects.html'">＋ New</button>
+          <button id="exportBtn" class="btn small" onclick="location.href='projects.html'">⤓ Export JSON</button>
+        </div>
+      </div>
+      <div class="grid" id="projectGrid"></div>
+    </section>
+
+    <section class="about" aria-labelledby="about-title">
+      <div class="portrait" id="portrait" aria-hidden="true"></div>
+      <div class="bio">
+        <h2 id="about-title">About me</h2>
+        <p><strong>Hi, I’m Jacopo.</strong> Swiss–Italian analyst and builder. I help SMEs & startups land in Switzerland and scale—especially in fintech, med‑tech and AI‑powered products.</p>
+        <p>I turn signal into concise briefs and ship small tools that remove friction: from drive automations to the 1‑million‑slot AI billboard concept.</p>
+        <div class="cta"><a class="btn" href="bio.html">→ Full bio</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap">
+      <div>© 2025 The (un)Stable Net</div>
+      <div>Multi‑file build • API‑ready</div>
+    </div>
+  </footer>
+
+  <script>
+    // sr-only utility for a11y labels
+    (function(){const s=document.createElement('style');s.textContent=`.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}`;document.head.appendChild(s)})();
+
+    // Tech network canvas
+    (function(){const c=document.getElementById('net');if(!c)return;const x=c.getContext('2d');const d=Math.max(1,Math.min(2,window.devicePixelRatio||1));let w,h,p=[];const N=72;const R=matchMedia('(prefers-reduced-motion: reduce)').matches;function r(a,b){return Math.random()*(b-a)+a}function size(){w=c.clientWidth;h=c.clientHeight;c.width=w*d;c.height=h*d;x.setTransform(d,0,0,d,0,0)}function reset(){p=Array.from({length:N},()=>({x:r(0,w),y:r(0,h),vx:r(-.3,.3),vy:r(-.2,.2)}))}function step(){x.clearRect(0,0,w,h);const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,'rgba(31,74,255,0.10)');g.addColorStop(1,'rgba(0,183,255,0.08)');x.fillStyle=g;x.fillRect(0,0,w,h);for(let i=0;i<p.length;i++){const a=p[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>w)a.vx*=-1;if(a.y<0||a.y>h)a.vy*=-1;x.beginPath();x.arc(a.x,a.y,1.6,0,Math.PI*2);x.fillStyle='rgba(33,64,184,0.9)';x.fill();for(let j=i+1;j<p.length;j++){const b=p[j],dx=a.x-b.x,dy=a.y-b.y,dst=Math.hypot(dx,dy);if(dst<120){x.strokeStyle=`rgba(100,150,255,${0.14*(1-dst/120)})`;x.lineWidth=1;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}}if(!R)requestAnimationFrame(step)}size();reset();step();addEventListener('resize',size);if(R)step()})();
+
+    // API paths (static JSON). When hosting, place files under ./api/*. Fallback to defaults here.
+    const API_PROJECTS = 'api/projects.json';
+
+    const DEFAULTS = {
+      projects:[
+        {id:'msb', title:'Million Slots Billboard', tag:'Platform', blurb:'A permanent AI video mosaic with 1,000,000 micro‑slots. Claim space and publish.', href:'msb.html', cover:''},
+        {id:'emm', title:'European Market Movers', tag:'Newsletter', blurb:'Weekly, PM‑style wrap of European markets.', href:'articles.html', cover:''}
+      ]
+    };
+
+    // Helpers
+    const grid = document.getElementById('projectGrid');
+    let DATA = DEFAULTS;
+
+    function genCover(title, tag){
+      const svg=`<?xml version="1.0"?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675'>
+      <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#1f4aff'/><stop offset='100%' stop-color='#00b7ff'/></linearGradient></defs>
+      <rect width='1200' height='675' fill='#0b1226'/><rect width='1200' height='675' fill='url(#g)' opacity='0.18'/>
+      <text x='40' y='80' fill='#dbe5ff' font-family='Inter,Arial' font-weight='700' font-size='42'>${(title||'Project').replace(/</g,'&lt;')}</text>
+      <text x='40' y='120' fill='#a9b7d9' font-family='Inter,Arial' font-size='24'>${(tag||'')}</text></svg>`;
+      return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+    }
+
+    function cardTemplate(p){
+      const cover = p.cover || genCover(p.title,p.tag);
+      return `<article class="card">
+        <div class="cover" style="background-image:url('${cover}')" title="Open ${p.title}" onclick="location.href='${p.href}'"></div>
+        <div class="inner">
+          <span class="tag">${p.tag||''}</span>
+          <h3 style="margin:8px 0 6px">${p.title||''}</h3>
+          <p>${p.blurb||''}</p>
+          <div class="actions">
+            <a class="ghost" href="${p.href}">View page</a>
+          </div>
+        </div>
+      </article>`
+    }
+
+    function render(){ grid.innerHTML = DATA.projects.map((p)=>cardTemplate(p)).join(''); }
+
+    async function load(){
+      try{ const r=await fetch(API_PROJECTS,{cache:'no-store'}); if(!r.ok) throw new Error('no api'); DATA = await r.json(); }
+      catch{ DATA = DEFAULTS; }
+      render();
+    }
+
+    load();
+  </script>
+</body>
+</html>

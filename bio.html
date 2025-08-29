@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jacopo — Full Bio</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--line:#e7edf7; --ink:#0b152c; --maxw:920px}
+    body{margin:0; font-family:Inter,system-ui,sans-serif; color:var(--ink); background:linear-gradient(180deg,#f7faff,#ffffff)}
+    header{position:sticky;top:0;background:rgba(255,255,255,.8);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    a{color:#2140b8; text-decoration:none}
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:18px 20px}
+    .head{display:grid; grid-template-columns: 0.32fr 1fr; gap:20px; align-items:center}
+    .photo{width:100%; aspect-ratio:1/1; border-radius:24px; border:6px solid #fff; box-shadow:0 10px 30px rgba(12,23,52,.08); background: url('https://dummyimage.com/800x800/1b274d/ced9ff&text=Your+Photo') center/cover no-repeat}
+    h1{font-size: clamp(30px,4.6vw,52px); margin:0}
+    .sub{color:#4c5c83; margin-top:6px}
+    .badges{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+    .badge{background:#eef4ff; border:1px solid #dbe6ff; color:#2140b8; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px}
+    .body{margin-top:18px; background:#fff; border:1px solid var(--line); border-radius:16px; box-shadow:0 10px 30px rgba(12,23,52,.06); padding:18px}
+    footer{color:#61709a; padding:20px 0; text-align:center}
+    @media (max-width: 780px){ .head{grid-template-columns:1fr} .photo{order:-1} }
+  </style>
+</head>
+<body>
+  <header><div class="wrap"><a href="index.html">← Home</a></div></header>
+  <main class="wrap">
+    <div class="head">
+      <div id="photo" class="photo"></div>
+      <div>
+        <h1>Jacopo — Analyst & Builder (EU–CH)</h1>
+        <p class="sub">I turn market noise into crisp briefs and ship small, useful AI products for SMEs and teams.</p>
+        <div class="badges"><span class="badge">Markets & Strategy</span><span class="badge">AI Tooling</span><span class="badge">EU–CH Go‑to‑Market</span></div>
+      </div>
+    </div>
+    <section class="body">
+      <h3>Skills‑first snapshot</h3>
+      <p>Strategy and market analysis, content systems, and lightweight AI tooling. Recent work: <em>European Market Movers</em> and the <em>Million Slots Billboard</em> concept.</p>
+      <h3>Results that matter</h3>
+      <ul>
+        <li>Guided SMEs/startups into Switzerland with clear, practical entry plans.</li>
+        <li>Packaged MDR/IVDR notes for med‑tech; coordinated ICE collective at Swiss Biotech Day 2025.</li>
+        <li>Shipped utilities that save hours: doc automations, shareable briefs, repeatable research templates.</li>
+      </ul>
+      <h3>Where I’m heading</h3>
+      <p>Building a portfolio of concise research, tools, and experiments at the intersection of markets and AI. Open to collaborations that value clarity, speed, and craft.</p>
+      <h3>Contact</h3>
+      <p>Email / LinkedIn / X — happy to connect.</p>
+      <div style="text-align:center; margin-top:14px"><a href="index.html">← Back to Home</a></div>
+    </section>
+    <footer>© <span id="y"></span> The (un)Stable Net</footer>
+  </main>
+
+  <script>
+    (function(){ const u = localStorage.getItem('tsn_bio_photo'); if(u) document.getElementById('photo').style.backgroundImage = `url('${u}')`; document.getElementById('y').textContent = new Date().getFullYear();})();
+  </script>
+</body>
+</html>
